@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import PresentationPage from './pages/PresentationPage';
 
-// Componente temporare pentru rutele noastre
-const PresentationPage = () => <div style={{ padding: '80px', textAlign: 'center' }}><h1>Präsentation</h1></div>;
+// Componente temporare pentru restul rutelor
 const HomePage = () => <div style={{ padding: '80px', textAlign: 'center' }}><h1>Startseite (Filme & TV)</h1></div>;
 const UserProfilePage = () => <div style={{ padding: '80px', textAlign: 'center' }}><h1>Benutzerprofil</h1></div>;
 const PaymentPage = () => <div style={{ padding: '80px', textAlign: 'center' }}><h1>Zahlung</h1></div>;
@@ -11,6 +11,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<PresentationPage />} />
+        
         <Route path="/home" element={<HomePage />} />
         <Route path="/userprofile" element={<UserProfilePage />} />
         <Route path="/payment" element={<PaymentPage />} />
