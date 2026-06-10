@@ -15,7 +15,7 @@ const PresentationPage = () => {
           </span>
           <div className="d-flex align-items-center">
             <span className="badge bg-dark border border-secondary text-secondary me-3" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-              v2.4.1 (Tema 2)
+              Thema 2: TV Video Streaming System<br /><br />Chitea Razvan und Gabriel Man
             </span>
           </div>
         </div>
