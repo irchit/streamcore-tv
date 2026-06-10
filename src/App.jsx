@@ -2,8 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import PresentationPage from './pages/PresentationPage';
 import HomePage from './pages/HomePage';
 import UserProfilePage from './pages/UserProfilePage';
-
-const PaymentPage = () => <div style={{ padding: '80px', textAlign: 'center' }}><h1>Zahlung</h1></div>;
+import PaymentPage from './pages/PaymentPage';
 
 function App() {
   return (
