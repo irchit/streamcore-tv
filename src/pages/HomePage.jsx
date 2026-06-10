@@ -1,12 +1,25 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, subscriptions, content } = useAppContext();
   
   const [selectedSourceId, setSelectedSourceId] = useState(subscriptions[0].id);
+  const [showToast, setShowToast] = useState(false);
+
+  useEffect(() => {
+    if (location.state?.showSuccessToast) {
+      setShowToast(true);
+      const timer = setTimeout(() => {
+        setShowToast(false);
+        window.history.replaceState({}, document.title);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [location.state]);
 
   const selectedSubscription = subscriptions.find(sub => sub.id === selectedSourceId);
   const isSubscriptionActive = selectedSubscription?.active;
@@ -17,6 +30,15 @@ const HomePage = () => {
 
   return (
     <div className="min-vh-100 text-light pb-5" style={{ backgroundColor: 'var(--bg)' }}>
+      
+      {showToast && (
+        <div className="position-fixed top-0 start-50 translate-middle-x mt-4" style={{ minWidth: '320px', zIndex: 9999 }}>
+          <div className="alert alert-success d-flex align-items-center gap-3 border-0 shadow-lg px-4 py-3 rounded-pill bg-success text-white" style={{ backdropFilter: 'blur(10px)' }}>
+            <i className="bi bi-check-circle-fill fs-4"></i>
+            <span className="fw-bold">Abonnement erfolgreich hinzugefügt!</span>
+          </div>
+        </div>
+      )}
       
       <nav className="navbar navbar-expand-lg navbar-dark sticky-top py-3" style={{ background: 'linear-gradient(180deg, rgba(8,12,20,0.98) 0%, rgba(8,12,20,0.85) 100%)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--border)' }}>
         <div className="container-fluid px-4">
@@ -103,7 +125,7 @@ const HomePage = () => {
                 className="btn btn-primary btn-lg fw-bold rounded-pill px-5 shadow"
                 onClick={() => navigate(`/userprofile?tab=selectAbo`)}
               >
-                <i className="bi bi-cart-plus-fill me-2"></i> Zum Abonnement hinzufügen ({selectedSubscription.price}/Mo)
+                <i className="bi bi-cart-plus-fill me-2"></i> Zum Abonnement hinzufügen ({selectedSubscription.price} € /Mo)
               </button>
             </div>
           </div>
