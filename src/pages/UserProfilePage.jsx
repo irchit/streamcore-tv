@@ -5,17 +5,17 @@ import { useAppContext } from '../context/AppContext';
 const UserProfilePage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user, subscriptions, deactivateSubscription } = useAppContext();
+  const { user, subscriptions, deactivateSubscription, activateSubscription, terminateSubscription } = useAppContext();
   
   const isAboTab = searchParams.get('tab') === 'selectAbo';
 
   const totalCost = subscriptions
-    .filter(sub => sub.active)
+    .filter(sub => sub.status === 'active')
     .reduce((sum, sub) => sum + parseFloat(sub.price), 0)
     .toFixed(2);
 
   const handleSubscriptionClick = (sub) => {
-    if (!sub.active) {
+    if (sub.status === 'inactive') {
       navigate(`/payment?selected=${sub.id}`);
     }
   };
@@ -98,29 +98,51 @@ const UserProfilePage = () => {
 
               <div className="row g-3">
                 {subscriptions.map(sub => (
-                  <div key={sub.id} className={`col-12 p-3 rounded-3 border d-flex justify-content-between align-items-center flex-wrap gap-3 transition-all ${sub.active ? 'border-success bg-success bg-opacity-10' : 'border-secondary bg-transparent'}`}>
-                    <div style={{ maxWidth: '75%' }}>
+                  <div key={sub.id} className={`col-12 p-3 rounded-3 border d-flex justify-content-between align-items-center flex-wrap gap-3 transition-all ${sub.status === 'active' ? 'border-success bg-success bg-opacity-10' : sub.status === 'expiring' ? 'border-warning bg-warning bg-opacity-10' : 'border-secondary bg-transparent'}`}>
+                    <div style={{ maxWidth: '65%' }}>
                       <div className="d-flex align-items-center gap-2 mb-1">
                         <h5 className="fw-bold m-0 text-white">{sub.name}</h5>
-                        <span className={`badge px-2 py-1 small ${sub.active ? 'bg-success text-white' : 'bg-secondary text-dark'}`}>
-                          {sub.active ? 'Aktiv' : 'Inaktiv'}
+                        <span className={`badge px-2 py-1 small ${sub.status === 'active' ? 'bg-success text-white' : sub.status === 'expiring' ? 'bg-warning text-dark' : 'bg-secondary text-dark'}`}>
+                          {sub.status === 'active' ? 'Aktiv' : sub.status === 'expiring' ? 'Läuft ab' : 'Inaktiv'}
                         </span>
                       </div>
                       <p className="text-secondary small m-0">{sub.desc}</p>
+                      {sub.status === 'expiring' && (
+                        <p className="text-warning small m-0 mt-2 fw-bold d-flex align-items-center gap-1">
+                          <i className="bi bi-exclamation-circle-fill"></i> Gekündigt: Gilt bis zum {user.paymentday}
+                        </p>
+                      )}
                     </div>
                     <div className="text-end d-flex flex-column align-items-end gap-2">
                       <span className="font-monospace fw-bold fs-5 text-white">{sub.price} € <span className="fs-6 text-secondary fw-normal">/Mo</span></span>
                       
                       {isAboTab && (
                         <div>
-                          {sub.active ? (
+                          {sub.status === 'active' && (
                             <button 
                               className="btn btn-sm px-4 rounded-pill fw-bold btn-outline-danger"
                               onClick={() => deactivateSubscription(sub.id)}
                             >
                               Kündigen
                             </button>
-                          ) : (
+                          )}
+                          {sub.status === 'expiring' && (
+                            <div className="d-flex gap-2">
+                              <button 
+                                className="btn btn-sm px-3 rounded-pill fw-bold btn-success"
+                                onClick={() => activateSubscription(sub.id)}
+                              >
+                                Reaktivieren (Gratis)
+                              </button>
+                              <button 
+                                className="btn btn-sm px-3 rounded-pill fw-bold btn-outline-danger"
+                                onClick={() => terminateSubscription(sub.id)}
+                              >
+                                Endgültig löschen
+                              </button>
+                            </div>
+                          )}
+                          {sub.status === 'inactive' && (
                             <button 
                               className="btn btn-sm px-4 rounded-pill fw-bold btn-primary shadow-sm"
                               onClick={() => handleSubscriptionClick(sub)}

@@ -11,7 +11,7 @@ const ScrollRow = ({ children }) => {
 
   const handleMouseDown = (e) => {
     setIsDragging(true);
-    setHasMoved(false); // Resetăm la fiecare apăsare nouă
+    setHasMoved(false);
     setStartX(e.pageX - scrollRef.current.offsetLeft);
     setScrollLeft(scrollRef.current.scrollLeft);
   };
@@ -26,14 +26,13 @@ const ScrollRow = ({ children }) => {
 
   const handleMouseMove = (e) => {
     if (!isDragging) return;
-    setHasMoved(true); // Dacă mouse-ul se mișcă, înregistrăm acțiunea de drag
+    setHasMoved(true);
     e.preventDefault();
     const x = e.pageX - scrollRef.current.offsetLeft;
     const walk = (x - startX) * 2;
     scrollRef.current.scrollLeft = scrollLeft - walk;
   };
 
-  // Această funcție blochează click-ul pe filme DOAR dacă ai făcut drag
   const handleClickCapture = (e) => {
     if (hasMoved) {
       e.stopPropagation();
@@ -66,16 +65,18 @@ const HomePage = () => {
   const [heroItem, setHeroItem] = useState(null);
 
   const selectedSubscription = selectedSourceId === 'all'
-    ? { id: 'all', name: 'Alle anzeigen', active: true }
+    ? { id: 'all', name: 'Alle anzeigen', status: 'active' }
     : subscriptions.find(sub => sub.id === selectedSourceId);
 
-  const isSubscriptionActive = selectedSubscription?.active;
+  const isSubscriptionActive = selectedSourceId === 'all' 
+    ? true 
+    : (selectedSubscription?.status === 'active' || selectedSubscription?.status === 'expiring');
 
   const isStreamItem = (sourceId) => ['amazon-prime', 'netflix', 'disney-plus'].includes(sourceId);
 
   useEffect(() => {
     if (selectedSourceId === 'all') {
-      const activeItems = content.filter(item => !item.isRecording && subscriptions.find(sub => sub.id === item.sourceId)?.active);
+      const activeItems = content.filter(item => !item.isRecording && ['active', 'expiring'].includes(subscriptions.find(sub => sub.id === item.sourceId)?.status));
       setHeroItem(activeItems.length > 0 ? activeItems[0] : null);
     } else {
       const filtered = content.filter(item => item.sourceId === selectedSourceId);
@@ -125,7 +126,7 @@ const HomePage = () => {
 
   const activeContent = content.filter(item => {
     const sub = subscriptions.find(s => s.id === item.sourceId);
-    return sub?.active;
+    return sub?.status === 'active' || sub?.status === 'expiring';
   });
 
   const continueWatchingStream = activeContent.filter(item => !item.isRecording && isStreamItem(item.sourceId) && item.progress > 0);
@@ -139,7 +140,7 @@ const HomePage = () => {
     : content.filter(item => item.sourceId === selectedSourceId && item.isRecording);
 
   const lockedContent = selectedSourceId === 'all'
-    ? content.filter(item => !item.isRecording && !subscriptions.find(sub => sub.id === item.sourceId)?.active)
+    ? content.filter(item => !item.isRecording && !['active', 'expiring'].includes(subscriptions.find(sub => sub.id === item.sourceId)?.status))
     : [];
 
   return (
@@ -159,7 +160,6 @@ const HomePage = () => {
         .custom-scroll-row.grabbing {
           cursor: grabbing;
         }
-        /* Am șters "pointer-events: none" ca să funcționeze click-ul din nou */
         .custom-scroll-row::-webkit-scrollbar {
           height: 6px;
         }
@@ -236,7 +236,8 @@ const HomePage = () => {
                       onClick={() => setSelectedSourceId(sub.id)}
                     >
                       {sub.name}
-                      {!sub.active && <i className="bi bi-lock-fill text-warning ms-3"></i>}
+                      {sub.status === 'inactive' && <i className="bi bi-lock-fill text-warning ms-3"></i>}
+                      {sub.status === 'expiring' && <i className="bi bi-exclamation-triangle-fill text-warning ms-3"></i>}
                     </button>
                   </li>
                 ))}
