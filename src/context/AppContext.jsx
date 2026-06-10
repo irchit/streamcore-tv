@@ -5,10 +5,10 @@ const AppContext = createContext();
 export const AppProvider = ({ children }) => {
   const [user, setUser] = useState({
     name: "Max Mustermann",
-    paymentday: "2026-07-15", 
-    cloudUsed: 15,            
-    cloudTotal: 50,           
-    geoZone: "DE-Süd"         
+    paymentday: "2026-07-15",
+    cloudUsed: 15,
+    cloudTotal: 50,
+    geoZone: "DE-Süd"
   });
 
   const [subscriptions, setSubscriptions] = useState([
@@ -16,21 +16,21 @@ export const AppProvider = ({ children }) => {
       id: "dach-tv", 
       name: "DACH Regional & Live TV", 
       active: true, 
-      price: "9.99€", 
+      price: "9.99", 
       desc: "Inkludiert regionale Sender (DE, AT, CH) und Cloud-Recording-Basis." 
     },
     { 
       id: "us-entertainment", 
       name: "US Entertainment & Sport", 
       active: false, 
-      price: "14.99€", 
+      price: "14.99", 
       desc: "Premium US-Kanäle, Hollywood-Filme und exklusive Sport-Übertragungen." 
     },
     { 
       id: "cloud-ultra", 
       name: "Cloud Recording Pro (+100GB)", 
       active: false, 
-      price: "4.99€", 
+      price: "4.99", 
       desc: "Erweitert deinen Cloud-Speicher für automatische TV-Aufnahmen." 
     }
   ]);
@@ -57,9 +57,17 @@ export const AppProvider = ({ children }) => {
     setSubscriptions(prevSubs => 
       prevSubs.map(sub => sub.id === subId ? { ...sub, active: true } : sub)
     );
-    
     if (subId === "cloud-ultra") {
       setUser(prevUser => ({ ...prevUser, cloudTotal: 150 }));
+    }
+  };
+
+  const deactivateSubscription = (subId) => {
+    setSubscriptions(prevSubs => 
+      prevSubs.map(sub => sub.id === subId ? { ...sub, active: false } : sub)
+    );
+    if (subId === "cloud-ultra") {
+      setUser(prevUser => ({ ...prevUser, cloudTotal: 50 }));
     }
   };
 
@@ -74,6 +82,7 @@ export const AppProvider = ({ children }) => {
       content, 
       extendPaymentDate, 
       activateSubscription,
+      deactivateSubscription,
       changeGeoZone
     }}>
       {children}
