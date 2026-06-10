@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import PresentationPage from './pages/PresentationPage';
 import HomePage from './pages/HomePage';
+import UserProfilePage from './pages/UserProfilePage';
 
-const UserProfilePage = () => <div style={{ padding: '80px', textAlign: 'center' }}><h1>Benutzerprofil</h1></div>;
 const PaymentPage = () => <div style={{ padding: '80px', textAlign: 'center' }}><h1>Zahlung</h1></div>;
 
 function App() {
