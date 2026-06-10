@@ -438,6 +438,7 @@ const HomePage = () => {
 
           </div>
         )}
+        <a style={{ textDecoration: 'none', color: 'grey' }} href="/">Back to Presentation</a>
       </div>
     </div>
   );
